@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Invitados</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background: #0f0f0f;
+  color: white;
+  padding: 30px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Contenedor */
+#lista {
+  max-width: 600px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Tarjeta */
+.card {
+  background: rgba(255,255,255,0.05);
+  padding: 15px 20px;
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 10px;
+  align-items: center;
+
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeIn 0.6s ease forwards;
+}
+
+/* Texto */
+.nombre {
+  font-weight: bold;
+}
+
+.personas {
+  opacity: 0.8;
+}
+
+.telefono {
+  opacity: 0.7;
+  font-size: 13px;
+}
+
+.estado {
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.si {
+  background: #1db954;
+}
+
+.no {
+  background: #e53935;
+}
+
+/* Animación */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<h1>Invitados</h1>
+
+<div id="lista"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD0MGJqr4P9tTa8kzixdjB3tZAffZag9Vo",
+  authDomain: "invitaciones-prueba-8b345.firebaseapp.com",
+  projectId: "invitaciones-prueba-8b345",
+  storageBucket: "invitaciones-prueba-8b345.firebasestorage.app",
+  messagingSenderId: "803960207702",
+  appId: "1:803960207702:web:f23e70f87798c0e1097ef7"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const lista = document.getElementById("lista");
+
+/* 🔥 Escucha en tiempo real */
+onSnapshot(collection(db, "invitados"), (snapshot) => {
+
+  lista.innerHTML = ""; // limpia todo antes de volver a pintar
+
+  snapshot.forEach((doc) => {
+    const data = doc.data();
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+ card.innerHTML = `
+  <div class="nombre">${data.nombre}</div>
+  <div class="telefono">${data.telefono || "Sin número"}</div>
+  <div class="personas">${data.personas} personas</div>
+  <div class="estado ${data.asistencia === 'si' ? 'si' : 'no'}">
+    ${data.asistencia === 'si' ? 'Asistirá' : 'No asistirá'}
+  </div>
+`;
+
+    lista.appendChild(card);
+  });
+
+});
+</script>
+
+</body>
+</html>
